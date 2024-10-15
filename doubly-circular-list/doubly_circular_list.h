@@ -3,12 +3,25 @@ namespace structures {
 template<typename T>
 class DoublyCircularList {
  public:
-    DoublyCircularList();  // Constructor
-    ~DoublyCircularList();  // Destructor
+    DoublyCircularList() {  // Constructor
+        size_ = 0;
+        head = nullptr;
+    }
+
+    ~DoublyCircularList() {  // Destructor
+        clear();
+    }
 
     void clear();  // Clear the elements and free memory
 
-    void push_back(const T& data);  // Insert data in last position
+    void push_back(const T& data) {  // Insert data in last position
+        Node* new_element = new Node(data);  // Locating memory
+    
+        if (new_element == nullptr)
+            throw std::out_of_range("No memory available!");
+        
+        
+    }
     void push_front(const T& data);  // Insert data in the first index
     void insert(const T& data, std::size_t index);  // Insert data in index
     void insert_sorted(const T& data);  // Insert data respecting order
