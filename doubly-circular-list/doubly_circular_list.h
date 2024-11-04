@@ -1,4 +1,7 @@
+#include <iostream>
+
 namespace structures {
+
 
 template<typename T>
 class DoublyCircularList {
@@ -16,7 +19,9 @@ class DoublyCircularList {
         if (empty())
             throw std::out_of_range("The list is empty!");
 
-        for 
+        while(!(empty())) {
+            pop_front();
+        }
     }
 
     void push_back(const T& data) {  // Insert data in last position
@@ -40,7 +45,7 @@ class DoublyCircularList {
         size_++;
     }
 
-    void push_front(const T& data) { {  // Insert data in the first index
+    void push_front(const T& data) {  // Insert data in the first index
         Node* new_element = new Node(data);
     
         if (new_element == nullptr)
@@ -74,10 +79,8 @@ class DoublyCircularList {
         } else if (index == size()) {
             push_back(data);
         } else {
-            Node* prev_element = head;
-            for(std::size_t i = 0; i < index-1; i++) {
-                prev_element = element->next();
-            }
+            Node* prev_element = circular_iterating(head, index-1);
+    
             new_element->prev(prev_element);  // Linkin the left part
             new_element->next(prev_element->next());  // Linkin the right part
 
@@ -87,7 +90,23 @@ class DoublyCircularList {
             size_++;
         }
     }
-    void insert_sorted(const T& data);  // Insert data respecting order
+    void insert_sorted(const T& data) {  // Insert data respecting order
+        Node* new_element = new Node(data);
+
+        if (new_element == nullptr)
+            throw std::out_of_range("No memory available!");
+        
+        std::size_t index = size();
+
+        Node* element = head;
+
+        for(std::size_t i = 0; i < size()-1; i++) {
+            if (element->data > data)
+                index = i;
+            element = element->next();
+        }
+        insert(data, index);
+    }
 
     T pop(std::size_t index) {  // Remove element in index
         if (empty())
@@ -98,31 +117,17 @@ class DoublyCircularList {
         } else if (index == size()-1) {
             return pop_back();
         } else {
+            Node* to_remove = circular_iterating(head, index);
 
+            to_remove->prev()->next(to_remove->next());
+            to_remove->next()->prev(to_remove->prev());
+
+            T data = to_remove->data();
+            delete to_remove;
+            size_--;
+            return data;
         }
     }
-
-    Node* circular_iterating(Node* head, index) {
-        bool reverse_flux;
-
-        if (index > (size()/2 + 1))
-            reverse_flux = true;
-        else
-            reverse_flux = false;
-
-        Node* element = head;
-        if (reverse_flux) {  // If its easier to run thru the previous
-            for(std::size_t i = 0; i < ((size() - index)) {
-                element = element->prev();
-            }
-        } else {
-            for(std::size_t i = 0; i < index; i++) {
-                element = element->next();
-            }
-        }
-        return element;
-    }
-
 
     T pop_back() {  // Remove the last element
         if (empty())
@@ -163,7 +168,18 @@ class DoublyCircularList {
         return data;
     }
 
-    void remove(const T& data);  // Remove first appearence of data
+    void remove(const T& data) {  // Remove first appearence of data
+        if(empty())
+            throw std::out_of_range("The list is empty!");
+            
+        Node* element = head;
+
+        for(std::size_t i = 0; i < size()-1; i++) {
+            if (element->data() == data)
+                pop(i);
+            element = element->next();
+        }
+    }
 
     bool empty() {  // Verify emptiness
         return !(size_);
@@ -187,53 +203,18 @@ class DoublyCircularList {
         if (index >= size() || index < 0)
             throw std::out_of_range("Index out of range!");
         
+        Node* element = circular_iterating(head, index);
 
-        // Deciding if we go thru the left or right
-        bool reverse_flux;
-
-        if (index > (size()/2 + 1))
-            reverse_flux = true;
-        else
-            reverse_flux = false;
-
-        Node* element = head;
-        if (reverse_flux) {  // If its easier to run thru the previous
-            for(std::size_t i = 0; i < ((size() - index)) {
-                element = element->prev();
-            }
-        } else {
-            for(std::size_t i = 0; i < index; i++) {
-                element = element->next();
-            }
-        }
         return element->data();
     }
 
     const T& at(std::size_t index) const {  // Const version of above
-        // Same application
         if (index >= size() || index < 0)
             throw std::out_of_range("Index out of range!");
+        
+        Node* element = circular_iterating(head, index);
 
-        // Deciding if we go thru the left or right
-        bool reverse_flux;
-
-        if (index > (size()/2 + 1))
-            reverse_flux = true;
-        else
-            reverse_flux = false;
-
-        Node* element = head;
-        if (reverse_flux) {  // If its easier to run thru the previous
-            for(std::size_t i = 0; i < ((size() - index)) {
-                element = element->prev();
-            }
-            return element->data();
-        } else {
-            for(std::size_t i = 0; i < index; i++) {
-                element = element->next();
-            }
-            return element->data();
-        }
+        return element->data();    
     }
 
     std::size_t find(const T& data) const {  // Find the index of data
@@ -257,22 +238,72 @@ class DoublyCircularList {
     class Node {
      public:
         explicit Node(const T& data);  // Explicit construtctor
-        Node(const T& data, Node* next);  // Constructor with next pointer
-        Node(const T& data, Node* prev, Node* next);  // Complete constructor
-    
-        T& data();  // Return the address of the data in the node
-        const T& data() const;  // Const version
-    
-        Node* prev();  // Previous node getter
-        const Node* prev() const;  // Const version
-    
-        void prev(Node* node);  // Previous node setter
-    
-        Node* next();  // Next node getter
-        const Node* next() const;  // Const version
 
-        void next(Node* node);  // Next node setter
+        Node(const T& data, Node* next) {  // Constructor with next pointer
+            data_ = data;
+            next_ = next;
+        }
+
+        Node(const T& data, Node* prev, Node* next) {  // Complete constructor
+            data_ = data;
+            prev_ = prev;
+            next_ = next;
+        }
     
+        T& data() {  // Return the address of the data in the node
+            return &data;
+        }
+
+        const T& data() const {  // Const version
+            return &data;
+        }
+    
+        Node* prev() {  // Previous node getter
+            return prev_;
+        }
+
+        const Node* prev() const {  // Const version
+            return prev_;
+        }
+    
+        void prev(Node* node) {  // Previous node setter
+            prev_ = node;
+        }
+    
+        Node* next() {  // Next node getter
+            return next_;
+        }
+
+        const Node* next() const {  // Const version
+            return next_;
+        }
+
+        void next(Node* node) {  // Next node setter
+            next_ = node;
+        }
+    
+        Node* circular_iterating(Node* head, std::size_t index) {
+            bool reverse_flux;
+
+            if (index > (size()/2 + 1))
+                reverse_flux = true;
+            else
+                reverse_flux = false;
+
+            Node* element = head;
+            if (reverse_flux) {  // If its easier to run thru the previous
+                for(std::size_t i = 0; i < size() - index; i++) {
+                    element = element->prev();
+                }
+            } else {
+                for(std::size_t i = 0; i < index; i++) {
+                    element = element->next();
+                }
+            }
+            return element;
+        }
+
+
      private:
         T data_;  // Respective data
         Node* prev_;  // Pointer to the previous node
@@ -282,6 +313,6 @@ class DoublyCircularList {
     Node* head;  // First element
     std::size_t size_;  // List size
 
-}
+};
 
 }  // namespace structures
