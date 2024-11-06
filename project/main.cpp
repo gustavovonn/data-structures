@@ -1,3 +1,5 @@
+// <Copyright 2024 - Gustavo Rodrigues Alves D'Angelo e Pedro Zimmermann>
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -91,7 +93,7 @@ int main() {
     string filename;
     int cases = 1;
 
-    while (std::cin >> filename) {
+    while (std::cin >> filename) {  // While theres files inputed
         // Abertura do arquivo
         ifstream filexml(filename);
         if (!filexml.is_open()) {
@@ -142,24 +144,22 @@ int main() {
             tag_verify = false;
     
         
-        // std::cout << "TAMANHO DO TEXTO: " << texto.size() << '\n';        
-        // Print
+        // Print case, input and output
         std::cout << "case=" << cases << '\n';
         std::cout << "input=" << filename << '\n';
         std::cout << "output=";
     
     
         // Scenarios read
-        if (tag_verify) {
+        if (tag_verify) {  // Tags use is correct
             std::queue<Cenario> scenarios;
     
             Cenario first_scenario(texto, 0);
             scenarios.push(first_scenario);  // First scenario
 
             int positions;
-            std::size_t pos = 0;  // To handle the file
             
-            while (true) {
+            while (!scenarios.empty()) {  // Scenarios read loop
                 Cenario current_scenario = scenarios.front();
                 scenarios.pop();
 
@@ -186,49 +186,55 @@ int main() {
                 }
     
                 // Analysing
-                std::queue<Coord> clean_coords;
-
                 Coord robot_pos = {current_scenario.x, current_scenario.y};
-                clean_coords.push(robot_pos);
 
                 positions = 0;  // The answer to the second problem of the project
 
-                // Subs: up -> right -> down -> left
-                int row_offsets[] = {-1, 0, 1, 0};
-                int column_offsets[] = {0, 1, 0, -1};
-    
-                Coord current_pos;
-                while (!clean_coords.empty()) {
-                    current_pos = clean_coords.front();
-                    clean_coords.pop();
-                    for (size_t i = 0; i < 4; i++) {
-                        size_t x = current_pos.x + row_offsets[i];
-                        size_t y = current_pos.y + column_offsets[i];
-                        if (x >= 0 && y >= 0 && x < altura && y < largura) {
-                            if (area[x][y] == 1 && R[x][y] == 0) {
-                                R[x][y] = 1;
-                                area[x][y] = 0;
-                                clean_coords.push({x, y});
-                                positions++;
+                if (area[robot_pos.x][robot_pos.y] == 1) {
+                    std::queue<Coord> clean_coords;
+
+                    clean_coords.push(robot_pos);
+
+                    // Subs: up -> right -> down -> left
+                    int row_offsets[] = {-1, 0, 1, 0};
+                    int column_offsets[] = {0, 1, 0, -1};
+
+                    Coord current_pos;
+
+                    // Verify neighborhood while are positions to be verified
+                    while (!clean_coords.empty()) {
+                        current_pos = clean_coords.front();  // Current position
+                        clean_coords.pop();  // Remove from the queue
+                        for (size_t i = 0; i < 4; i++) {  // Looks to each neighbor
+                            size_t x = current_pos.x + row_offsets[i];
+                            size_t y = current_pos.y + column_offsets[i];
+
+                            // Position validation
+                            if (x >= 0 && y >= 0 && x < altura && y < largura) {
+                                // Verify its a position to clear
+                                if (area[x][y] == 1 && R[x][y] == 0) {
+                                    R[x][y] = 1;  // Puts in the auxiliar matrix
+                                    area[x][y] = 0;  // Clear the original
+                                    clean_coords.push({x, y});  // Add the new location to verify neighbors
+                                    positions++;  // Numbers of positions to clear is incremented
+                                }
                             }
                         }
                     }
                 }
-
+                // Print scenario names and positions to clean
                 std::cout << current_scenario.nome << " " << positions << '\n';
 
-                // std::cout << "FINAL POSITION: " << current_scenario.indice_final << '\n';
-                // if (texto[current_scenario.indice_final+3] == '\n')
-                //     break;
-                if (texto.size() - current_scenario.indice_final < 128) {
+                // 128 is a number of chars that another scenario may need
+                if ((texto.size() - current_scenario.indice_final) < 50) {
                     break;
-                } else {
-                    Cenario new_scenario(texto, current_scenario.indice_final);
-                    scenarios.push(new_scenario);
                 }
 
+                Cenario new_scenario(texto, current_scenario.indice_final);
+                scenarios.push(new_scenario);
+
             }
-        } else {
+        } else {  // Tag verify
             std::cout << "erro" << '\n';
         }
         cases++;  // To the possible next file
