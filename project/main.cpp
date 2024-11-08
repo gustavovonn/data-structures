@@ -6,7 +6,6 @@
 #include <stdexcept>
 #include <queue>
 #include <stack>
-#include <utility>  // To use pair
 
 using namespace std;
 
