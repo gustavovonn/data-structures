@@ -1,0 +1,32 @@
+   // Execucoes do heapsort:
+
+    auto start = std::chrono::high_resolution_clock::now();
+    heapsort(mil);
+    auto end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> float_ms = end - start;
+    std::cout << "Tempo de execucao Heapsort (Array c/ 1.000 ints): " << float_ms.count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    heapsort(cinco_mil);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> float_ms = end - start;
+    std::cout << "Tempo de execucao Heapsort (Array c/ 5.000 ints): " << float_ms.count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    heapsort(dez_mil);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> float_ms = end - start;
+    std::cout << "Tempo de execucao Heapsort (Array c/ 10.000 ints): " << float_ms.count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    heapsort(cinq_mil);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> float_ms = end - start;
+    std::cout << "Tempo de execucao Heapsort (Array c/ 50.000 ints): " << float_ms.count() << " ms\n";
+
+    start = std::chrono::high_resolution_clock::now();
+    heapsort(cem_mil);
+    end = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double, std::milli> float_ms = end - start;
+    std::cout << "Tempo de execucao Heapsort (Array c/ 100.000 ints): " << float_ms.count() << " ms\n";
+
